@@ -1,0 +1,26 @@
+# Datasets and generated results
+/data/
+/results/
+
+# Local notebooks, their helper scripts, and tests
+/notebooks/
+/tests/
+/experiments/figure_design.py
+/experiments/maps.py
+/experiments/som_partition.py
+
+# Environment and bytecode
+# (the mypy and ruff caches ignore themselves)
+.venv/
+__pycache__/
+
+# Editor, OS, and runtime files
+.vscode/
+.DS_Store
+.runtime/
+
+# Local assistant configuration
+/.claude/
+/.codex/
+/AGENTS.md
+/CLAUDE.md

@@ -1,0 +1,169 @@
+alpha: 0.1
+seeds: [42, 123, 288, 327, 456, 555, 690, 761, 832, 999]
+
+profiles:
+  smoke:
+    datasets: [synthetic_regression, synthetic_classification]
+    seeds: [42]
+  full:
+    datasets:
+      - bike
+      - bio
+      - california_housing
+      - concrete
+      - mpg
+      - cifar10
+      - mnist
+      - covertype
+      - cifar100
+      - imagenet1k
+
+datasets:
+  synthetic_regression:
+    task: regression
+    source: sklearn.make_regression
+    model: gradient_boosting
+    representation: standardized_features
+    split: {train: 120, selection: 40, calibration: 60, test: 60}
+    som: {grid: [3, 3], radius: 1, epochs: 5, batch_size: 32, learning_rate: 0.5, sigma: 1.0}
+  synthetic_classification:
+    task: classification
+    source: sklearn.make_classification
+    model: histogram_gradient_boosting
+    representation: standardized_features
+    classes: 4
+    split: {train: 160, selection: 40, calibration: 80, test: 80}
+    som: {grid: [3, 3], radius: 1, epochs: 5, batch_size: 32, learning_rate: 0.5, sigma: 1.0}
+
+  bike:
+    task: regression
+    source: CQR benchmark Bike Sharing data
+    model: gradient_boosting
+    representation: standardized_features
+    predictor: {n_estimators: 500, max_depth: 7, learning_rate: 0.1}
+    split: {train_fraction: 0.60, selection_fraction: 0.10, calibration_fraction: 0.15, test_fraction: 0.15}
+    som: {grid: [7, 9], radius: 2, epochs: 100, batch_size: 128, learning_rate: 0.95, sigma: 1.1}
+  bio:
+    task: regression
+    source: CASP/Bio
+    model: gradient_boosting
+    representation: standardized_features
+    predictor: {n_estimators: 800, max_depth: 7, learning_rate: 0.1}
+    split: {train_fraction: 0.60, selection_fraction: 0.10, calibration_fraction: 0.15, test_fraction: 0.15}
+    som: {grid: [9, 10], radius: 2, epochs: 100, batch_size: 256, learning_rate: 0.95, sigma: 1.4}
+  california_housing:
+    task: regression
+    source: sklearn California Housing
+    model: gradient_boosting
+    representation: standardized_features
+    predictor: {n_estimators: 500, max_depth: 7, learning_rate: 0.1}
+    split: {train_fraction: 0.60, selection_fraction: 0.10, calibration_fraction: 0.15, test_fraction: 0.15}
+    som: {grid: [7, 8], radius: 2, epochs: 100, batch_size: 128, learning_rate: 0.95, sigma: 1.1}
+  concrete:
+    task: regression
+    source: CQR benchmark Concrete data
+    model: gradient_boosting
+    representation: standardized_features
+    predictor: {n_estimators: 200, max_depth: 3, learning_rate: 0.05}
+    split: {train_fraction: 0.60, selection_fraction: 0.10, calibration_fraction: 0.15, test_fraction: 0.15}
+    som: {grid: [5, 6], radius: 1, epochs: 50, batch_size: 64, learning_rate: 0.85, sigma: 1.0}
+  mpg:
+    task: regression
+    source: UCI Auto MPG
+    model: gradient_boosting
+    representation: standardized_features
+    predictor: {n_estimators: 200, max_depth: 2, learning_rate: 0.05}
+    split: {train_fraction: 0.60, selection_fraction: 0.10, calibration_fraction: 0.15, test_fraction: 0.15}
+    som: {grid: [4, 5], radius: 1, epochs: 50, batch_size: 32, learning_rate: 0.85, sigma: 0.9}
+
+  cifar10:
+    task: classification
+    source: torchvision CIFAR-10
+    model: resnet18
+    classes: 10
+    # Calibration: the remaining 20% of the official training set. Test: the official test set.
+    split: {train_fraction: 0.70, selection_fraction: 0.10}
+    som: {grid: [12, 13], radius: 3, epochs: 100, batch_size: 128, learning_rate: 0.95, sigma: 2.3}
+  mnist:
+    task: classification
+    source: torchvision MNIST
+    model: resnet18
+    classes: 10
+    # Calibration: the remaining 20% of the official training set. Test: the official test set.
+    split: {train_fraction: 0.70, selection_fraction: 0.10}
+    som: {grid: [20, 20], radius: 4, epochs: 100, batch_size: 128, learning_rate: 0.95, sigma: 3.75}
+  covertype:
+    task: classification
+    source: sklearn Covertype
+    model: histogram_gradient_boosting
+    representation: standardized_features
+    classes: 7
+    sample_size: 50000
+    split: {train_fraction: 0.60, selection_fraction: 0.10, calibration_fraction: 0.15, test_fraction: 0.15}
+    som: {grid: [10, 13], radius: 2, epochs: 100, batch_size: 256, learning_rate: 0.95, sigma: 1.8}
+  cifar100:
+    task: classification
+    source: torchvision CIFAR-100
+    model: resnet18
+    classes: 100
+    # Calibration: the remaining 20% of the official training set. Test: the official test set.
+    split: {train_fraction: 0.70, selection_fraction: 0.10}
+    som: {grid: [12, 13], radius: 3, epochs: 100, batch_size: 128, learning_rate: 0.95, sigma: 2.3}
+  imagenet1k:
+    task: classification
+    source: ILSVRC2012 validation set
+    model: torchvision_resnet50_imagenet1k_v2
+    classes: 1000
+    cache: data/raw/imagenet_val_cache.npz
+    split: {train: 8000, selection: 2000, calibration: 20000, test: 20000}
+    som: {grid: [12, 13], radius: 3, epochs: 100, batch_size: 128, learning_rate: 0.95, sigma: 2.3}
+
+models:
+  gradient_boosting: {n_estimators: 300, max_depth: 5, learning_rate: 0.05}
+  # early_stopping: auto holds out 10% of the training rows and stops after ten
+  # rounds without improvement, once there are more than 10,000 training rows.
+  histogram_gradient_boosting: {max_iter: 300, max_leaf_nodes: 31, learning_rate: 0.1, early_stopping: auto}
+  chr: {n_bins: 999, n_estimators: 100, min_samples_leaf: 50}
+  flow: {hidden_size: 100, hidden_layers: 5, updates: 3001}
+  rcp: {hidden_size: 100, max_epochs: 5000, patience: 15}
+  vision: {epochs: 15, batch_size: 256, learning_rate: 0.001, embedding_dim: 32}
+
+som:
+  topology: rectangular
+  lr_decay_function: lr_inverse_decay_to_zero
+  sigma_decay_function: sig_inverse_decay_to_one
+  search_backend: auto
+
+methods:
+  regression:
+    scores: [abs_residual, cqr, chr, nf_cp, rcp]
+    calibrators: [pooled, guan_lcp, rlcp, mondrian_kmeans, socp]
+  classification:
+    scores: [lac, aps, raps, saps, rank]
+    calibrators: [pooled, classwise, clustered, guan_lcp, rlcp, mondrian_kmeans, socp]
+
+selection:
+  localized_bandwidth_target_ess: 50
+  mondrian_group_candidates: [5, 10, 15, 20, 25, 30]
+
+evaluation:
+  external_partition: {groups: 25}
+  external_partition_sensitivity: [10, 50]
+  wsc: {directions: 500, splits: 10, delta: 0.1}
+  ssc: {groups: 10}
+  ert: {folds: 5}
+
+sensitivity:
+  datasets:
+    california_housing: [[4, 4], [5, 6], [7, 8], [10, 10], [14, 14], [20, 20]]
+  radii: [0, 1, 2, 3]
+
+regime3:
+  primary_datasets: [concrete, mpg]
+  sensitivity_rows:
+    concrete: [20, 40, 80]
+    mpg: [20, 40]
+  # b: nine calibration rows give a finite cutoff at alpha = 0.1; 19 is the first
+  # count whose cutoff is not forced to the largest score. It is an efficiency
+  # margin, not a validity condition.
+  projected_buffer_floor: 19

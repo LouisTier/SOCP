@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "socp"
+dynamic = ["version"]
+description = "Self-Organized Conformal Prediction: reducing regional coverage gaps with unsupervised group discovery (NeurIPS 2026)."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Louis Berthier", email = "louis.berthier@polytechnique.edu" },
+    { name = "Ahmed Shokry" },
+    { name = "Maxime Moreaud" },
+    { name = "Guillaume Ramelet" },
+    { name = "Aymeric Dieuleveut" },
+]
+keywords = [
+    "conformal prediction",
+    "self-organizing maps",
+    "uncertainty quantification",
+    "local coverage",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.12",
+    "scikit-learn>=1.4",
+    "torch>=2.2",
+    "torchvision>=0.17",
+    # Tag socp-neurips2026: adds the fixed-cell retrieval used by Regime 3.
+    "torchsom @ git+https://github.com/michelin/TorchSOM.git@020ec6890aafa10def406fea1ddcdb0e266a601e",
+    "pandas>=2.2",
+    "pyyaml>=6.0",
+    "covmetrics>=0.1.2",
+]
+
+[project.urls]
+Repository = "https://github.com/LouisTier/SOCP"
+Paper = "https://arxiv.org/abs/2606.29403"
+
+[project.scripts]
+socp-experiments = "experiments.cli:main"
+
+[tool.hatch.version]
+path = "socp/__init__.py"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["socp", "experiments"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.3",
+    "mypy>=1.9",
+    "types-pyyaml>=6.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["N803", "N806", "E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["socp", "experiments"]
+known-third-party = ["torchsom"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["sklearn.*", "scipy.*", "torchvision.*", "torchsom.*", "pandas.*"]
+ignore_missing_imports = true
